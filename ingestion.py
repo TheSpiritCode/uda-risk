@@ -23,7 +23,7 @@ def merge_multiple_dataframe():
             dfs.append(pd.read_csv(os.path.join(input_folder_path, filename)))
     df = pd.concat(dfs, ignore_index=True)
     df = df.drop_duplicates()
-    df.to_csv(os.path.join(output_folder_path, "finaldata.csv"))
+    df.to_csv(os.path.join(output_folder_path, "finaldata.csv"), index=False)
     with open(os.path.join(output_folder_path, "ingestedfiles.txt"), "w") as f:
         f.writelines(log_lines)
 
