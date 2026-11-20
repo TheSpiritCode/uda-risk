@@ -24,7 +24,7 @@ def score_model():
     # and write the confusion matrix to the workspace
     model = pickle.load(open(model_path, "rb"))
     df = pd.read_csv(dataset_csv_path)
-    X = df.drop(columns=["corporation", "exited"])
+    X = df.drop(columns=["corporation", "exited"]).values.reshape(-1, 3)
     y_true = df["exited"].values.reshape(-1, 1)
     preds = model.predict(X)
 
