@@ -37,7 +37,7 @@ def deploy_files(latestscore=None, model=None, ingestedfiles=None):
 
     dest_mapping = {
         os.path.join(prod_deployment_path, "ingestedfiles.txt"): ingestedfiles,
-        os.path.join(prod_deployment_path, "tainedmode.pkl"): model,
+        os.path.join(prod_deployment_path, "trainedmodel.pkl"): model,
         os.path.join(prod_deployment_path, "latestscore.txt"): latestscore,
     }
 
