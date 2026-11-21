@@ -9,33 +9,37 @@ URL = "http://127.0.0.1:5000"
 with open("config.json", "r") as f:
     config = json.load(f)
 
-output_path = os.path.join(
-    config["output_model_path"], "apireturns.txt"
-)
+output_path = os.path.join(config["output_model_path"], "apireturns.txt")
 
-# Call each API endpoint and store the responses
-# predict
-response1 = requests.post(
-    f"{URL}/prediction", data={"dataset": "testdata/testdata.csv"}
-)
 
-# scoring
-response2 = requests.get(f"{URL}/scoring")
+def run_api_calls(result_path=output_path):
+    # Call each API endpoint and store the responses
+    # predict
+    response1 = requests.post(
+        f"{URL}/prediction", data={"dataset": "testdata/testdata.csv"}
+    )
 
-# summarystats
-response3 = response2 = requests.get(f"{URL}/summarystats")
+    # scoring
+    response2 = requests.get(f"{URL}/scoring")
 
-# diagnostics
-response4 = response2 = requests.get(f"{URL}/diagnostics")
+    # summarystats
+    response3 = response2 = requests.get(f"{URL}/summarystats")
 
-# # Combine all API responses
-responses = {
-    "predict": response1.json(),
-    "scoring": response2.json(),
-    "summarystats": response3.json(),
-    "diagnostics": response4.json()
-}
+    # diagnostics
+    response4 = response2 = requests.get(f"{URL}/diagnostics")
 
-# Write the responses to your workspace
-with open(output_path, 'w') as f:
-    json.dump(responses, f)
+    # # Combine all API responses
+    responses = {
+        "predict": response1.json(),
+        "scoring": response2.json(),
+        "summarystats": response3.json(),
+        "diagnostics": response4.json(),
+    }
+
+    # Write the responses to your workspace
+    with open(result_path, "w") as f:
+        json.dump(responses, f)
+
+
+if __name__ == "__main__":
+    run_api_calls()

@@ -15,11 +15,11 @@ with open("config.json", "r") as f:
 
 dataset_csv_path = os.path.join(config["test_data_path"], "testdata.csv")
 model_path = os.path.join(config["output_model_path"], "trainedmodel.pkl")
-matrix_path = os.path.join(config["output_model_path"], "confusionmatrix.png")
+matrix_path = os.path.join(config["output_model_path"])
 
 
 # Function for reporting
-def score_model():
+def score_model(matrix_name="confusionmatrix.png"):
     # Calculate a confusion matrix using the test data and the deployed model
     # and write the confusion matrix to the workspace
     model = pickle.load(open(model_path, "rb"))
@@ -32,7 +32,7 @@ def score_model():
         y_true, preds, labels=[0, 1], display_labels=[0, 1], cmap="Blues"
     )
     disp.ax_.set_title("Confusion Matrix")
-    plt.savefig(matrix_path, dpi=150, bbox_inches="tight")
+    plt.savefig(os.path.join(matrix_path, matrix_name), dpi=150, bbox_inches="tight")
 
 
 if __name__ == "__main__":
