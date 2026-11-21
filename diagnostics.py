@@ -6,7 +6,6 @@ import subprocess
 import sys
 import timeit
 
-import numpy as np
 import pandas as pd
 
 from ingestion import merge_multiple_dataframe
@@ -17,10 +16,10 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 dataset_csv_path = os.path.join(config["output_folder_path"])
-test_data_path = os.path.join(config["test_data_path"], "testdata.csv")
+test_data_path = os.path.join(config["test_data_path"])
 production_path = os.path.join(config["prod_deployment_path"])
 
-
+# regex catching newest version of package from pip response
 pattern = re.compile(r"^\S+\s+\(([^)]+)\)")
 
 
@@ -30,7 +29,9 @@ def model_predictions(dataframe: pd.DataFrame):
     # and predict for the supplied DataFrame.
     # Select the same predictor columns used for training;
     # do not include the target.
-    model = pickle.load(open(os.path.join(production_path, "trainedmodel.pkl"), "rb"))  # noqa: E501
+    with open(production_path + "/trainedmodel.pkl", "rb") as f:
+        model = pickle.load(f)
+
     drop_cols = [
         col
         for col in dataframe.columns
@@ -50,7 +51,7 @@ def model_predictions(dataframe: pd.DataFrame):
 def dataframe_summary():
     # Read the ingested dataset from output_folder_path.
     # For each numeric column, calculate mean, median, and standard deviation.
-    df = pd.read_csv(os.path.join(dataset_csv_path, "finaldata.csv"))
+    df = pd.read_csv(dataset_csv_path + "/finaldata.csv")
 
     return [
         df.mean(numeric_only=True).to_list(),
@@ -63,7 +64,7 @@ def dataframe_summary():
 def missing_data():
     # Calculate missing-value percentages for every ingested dataset column,
     # including nonnumeric columns, and return a list in column order.
-    df = pd.read_csv(os.path.join(dataset_csv_path, "finaldata.csv"))
+    df = pd.read_csv(dataset_csv_path + "/finaldata.csv")
 
     return df.isna().mean() * 100
 
@@ -74,12 +75,15 @@ def execution_time():
     # and the rubric. Isolate timing outputs;
     # do not replace the deployed model.
     result = []
+
     start = timeit.default_timer()
     merge_multiple_dataframe()
     result.append(timeit.default_timer() - start)
+
     start = timeit.default_timer()
     train_model()
     result.append(timeit.default_timer() - start)
+
     return result
 
 
@@ -112,18 +116,20 @@ def outdated_packages_list():
                 )
                 re_match = pattern.match(result.stdout.strip())
                 version = re_match.group(1) if re_match else "NA"
-            except (subprocess.SubprocessError, OSError) as e:
-                print(e)
+            except (subprocess.SubprocessError, OSError):
                 version = "NA"
 
             packages.append((line_split[0], line_split[1], version))
-    return pd.DataFrame(packages, columns=["package", "current", "latest"])
+
+    final_df = pd.DataFrame(packages, columns=["package", "current", "latest"])
+
+    return final_df.to_dict(orient="records")
 
 
 if __name__ == "__main__":
     # Load test_data_path/testdata.csv into a DataFrame
     # and pass it to model_predictions.
-    df = pd.read_csv(test_data_path)
+    df = pd.read_csv(test_data_path + "/testdata.csv")
     model_predictions(df)
     dataframe_summary()
     missing_data()

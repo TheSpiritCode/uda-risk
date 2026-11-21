@@ -2,12 +2,8 @@ import json
 import os
 import pickle
 
-import numpy as np
 import pandas as pd
-from flask import Flask, jsonify, request, session
 from sklearn import metrics
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
 
 # Load config.json and get path variables
 with open("config.json", "r") as f:
@@ -15,8 +11,8 @@ with open("config.json", "r") as f:
 
 dataset_csv_path = os.path.join(config["output_folder_path"])
 test_data_path = os.path.join(config["test_data_path"])
-model_path = os.path.join(config["output_model_path"], "trainedmodel.pkl")
-output_score_path = os.path.join(config["output_model_path"], "latestscore.txt")
+model_path = os.path.join(config["output_model_path"])
+output_score_path = os.path.join(config["output_model_path"])
 
 
 # Function for model scoring
@@ -55,7 +51,6 @@ if __name__ == "__main__":
             dfs.append(pd.read_csv(os.path.join(test_data_path, filename)))
     df = pd.concat(dfs, ignore_index=True)
     df = df.drop_duplicates()
-    model = pickle.load(
-        open(model_path, "rb")  # noqa: E501
-    )
-    print(score_model(model, df, output_score_path))
+    with open(model_path + "/trainedmodel.pkl", "rb") as f:
+        model = pickle.load(f)
+    print(score_model(model, df, output_score_path + "/latestscore.txt"))

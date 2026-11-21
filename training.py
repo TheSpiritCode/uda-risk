@@ -2,24 +2,20 @@ import json
 import os
 import pickle
 
-import numpy as np
 import pandas as pd
-from flask import Flask, jsonify, request, session
-from sklearn import metrics
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
 
 # Load config.json and get path variables
 with open("config.json", "r") as f:
     config = json.load(f)
 
-dataset_csv_path = os.path.join(config["output_folder_path"], "finaldata.csv")
-model_path = os.path.join(config["output_model_path"], "trainedmodel.pkl")
+dataset_csv_path = os.path.join(config["output_folder_path"])
+model_path = os.path.join(config["output_model_path"])
 
 
 # Function for training the model
 def train_model():
-    dataset = pd.read_csv(dataset_csv_path)
+    dataset = pd.read_csv(dataset_csv_path + "/finaldata.csv")
     X = dataset.loc[
         :,
         [
@@ -29,9 +25,6 @@ def train_model():
         ],
     ].values.reshape(-1, 3)
     y = dataset["exited"].values.reshape(-1, 1).ravel()
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
-    )
 
     # use this logistic regression for training
     logit = LogisticRegression(
@@ -52,11 +45,12 @@ def train_model():
     )
 
     # Fit the logistic regression to your data
-    model = logit.fit(X_train, y_train)
+    model = logit.fit(X, y)
 
     # Write the trained model to your
     # workspace in a file called trainedmodel.pkl
-    pickle.dump(model, open(model_path, "wb"))
+    with open(model_path + "/trainedmodel.pkl", "wb") as f:
+        pickle.dump(model, f)
 
 
 if __name__ == "__main__":

@@ -9,10 +9,10 @@ URL = "http://127.0.0.1:8000"
 with open("config.json", "r") as f:
     config = json.load(f)
 
-output_path = os.path.join(config["output_model_path"], "apireturns.txt")
+output_path = os.path.join(config["output_model_path"])
 
 
-def run_api_calls(result_path=output_path):
+def run_api_calls(result_filename="apireturns.txt"):
     # Call each API endpoint and store the responses
     # predict
     response1 = requests.post(
@@ -37,7 +37,7 @@ def run_api_calls(result_path=output_path):
     }
 
     # Write the responses to your workspace
-    with open(result_path, "w") as f:
+    with open(f"{output_path}/{result_filename}", "w") as f:
         json.dump(responses, f)
 
 

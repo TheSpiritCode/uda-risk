@@ -2,9 +2,8 @@ import json
 import os
 import pickle
 
-import numpy as np
 import pandas as pd
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, request
 
 from diagnostics import (
     dataframe_summary,
@@ -23,10 +22,11 @@ with open("config.json", "r") as f:
     config = json.load(f)
 
 dataset_csv_path = os.path.join(config["output_folder_path"])
-test_dataset_csv_path = os.path.join(config["test_data_path"], "testdata.csv")
-model_path = os.path.join(config["prod_deployment_path"], "trainedmodel.pkl")
+test_dataset_csv_path = os.path.join(config["test_data_path"])
+model_path = os.path.join(config["prod_deployment_path"])
 
-prediction_model = None
+with open(model_path + "/trainedmodel.pkl", "rb") as model_file:
+    prediction_model = pickle.load(model_file)
 
 
 # Prediction Endpoint
@@ -47,10 +47,10 @@ def scoring_endpoint():
     # Score the deployed model
     # on test_data_path/testdata.csv using score_model.
     # Do not overwrite the deployed baseline score.
-    model = pickle.load(open(model_path, "rb"))
-    df = pd.read_csv(test_dataset_csv_path)
 
-    return jsonify(score_model(model, df))
+    df = pd.read_csv(test_dataset_csv_path + "/testdata.csv")
+
+    return jsonify(score_model(prediction_model, df))
 
 
 # Summary Statistics Endpoint
@@ -70,7 +70,7 @@ def diagnostics_endpoint():
         {
             "missing_data": missing_data().to_list(),
             "timings": execution_time(),
-            "outdated_packages": outdated_packages_list().to_dict(orient="records"),  # noqa: E501
+            "outdated_packages": outdated_packages_list(),
         }
     )
 

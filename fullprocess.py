@@ -6,7 +6,6 @@ import pandas as pd
 
 import apicalls
 import deployment
-import diagnostics
 import ingestion
 import reporting
 import scoring
@@ -90,4 +89,4 @@ if new_score < baseline:
 # timing and dependency results may vary.
 # Do not force retraining for new reports.
 reporting.score_model("confusionmatrix2.png")
-apicalls.run_api_calls(model_output_path + "/apireturns2.txt")
+apicalls.run_api_calls("apireturns2.txt")
