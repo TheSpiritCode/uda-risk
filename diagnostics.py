@@ -53,9 +53,9 @@ def dataframe_summary():
     df = pd.read_csv(os.path.join(dataset_csv_path, "finaldata.csv"))
 
     return [
-        df.mean(numeric_only=True),
-        df.median(numeric_only=True),
-        df.std(numeric_only=True),
+        df.mean(numeric_only=True).to_list(),
+        df.median(numeric_only=True).to_list(),
+        df.std(numeric_only=True).to_list(),
     ]
 
 

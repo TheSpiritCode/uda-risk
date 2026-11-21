@@ -44,7 +44,7 @@ def score_model(model, dataframe, score_path=None):
         with open(score_path, "w") as f:
             f.write(str(f1))
 
-    return f1
+    return float(f1)
 
 
 if __name__ == "__main__":
