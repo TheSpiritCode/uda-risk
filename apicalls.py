@@ -23,10 +23,10 @@ def run_api_calls(result_filename="apireturns.txt"):
     response2 = requests.get(f"{URL}/scoring")
 
     # summarystats
-    response3 = response2 = requests.get(f"{URL}/summarystats")
+    response3 = requests.get(f"{URL}/summarystats")
 
     # diagnostics
-    response4 = response2 = requests.get(f"{URL}/diagnostics")
+    response4 = requests.get(f"{URL}/diagnostics")
 
     # # Combine all API responses
     responses = {
